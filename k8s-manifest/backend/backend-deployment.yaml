@@ -13,6 +13,7 @@ spec:
       labels:
         app: backend
     spec:
+      serviceAccountName: flask-sa
       containers:
       - name: backend
         image: <your-ecr-repo>/backend:latest
@@ -22,7 +23,7 @@ spec:
         - name: DB_SECRET_NAME
           value: "prod/db/credentials"
         - name: AWS_REGION
-          value: "us-west-2"
+          value: "us-east-2"
         - name: DB_HOST
           valueFrom:
             configMapKeyRef:
@@ -45,3 +46,17 @@ spec:
           requests:
             cpu: "0.5"
             memory: "512Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
