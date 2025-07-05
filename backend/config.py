@@ -1,9 +1,10 @@
+# config.py
 import os
 import boto3
 import json
 import urllib.parse
 
-def get_secret():
+def get_rds_secret():
     secret_name = os.getenv("DB_SECRET_NAME")
     region_name = os.getenv("AWS_REGION", "us-east-1")
 
@@ -19,20 +20,18 @@ def get_secret():
 
 class Config:
     try:
-        username, password = get_secret()
+        username, password = get_rds_secret()
     except Exception as e:
-        print("Failed to fetch secret:", e)
+        print("Error fetching RDS secret:", e)
         username = "admin"
         password = "password"
 
     user     = urllib.parse.quote_plus(username)
     password = urllib.parse.quote_plus(password)
-    host     = os.getenv("DB_HOST", "mysql")
+    host     = os.getenv("DB_HOST", "localhost")
     port     = os.getenv("DB_PORT", "3306")
     dbname   = os.getenv("DB_NAME", "employees")
-    
-    SQLALCHEMY_DATABASE_URI = (
-        f"mysql+pymysql://{user}:{password}@{host}:{port}/{dbname}"
-    )
+
+    SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{user}:{password}@{host}:{port}/{dbname}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.environ.get("SECRET_KEY", "dev")
