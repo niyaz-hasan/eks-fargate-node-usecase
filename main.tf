@@ -11,6 +11,10 @@ module "iam" {
   aws_iam_openid_connect_provider_arn = module.eks.aws_iam_openid_connect_provider_arn
   aws_iam_openid_connect_provider_extract_from_arn = module.eks.aws_iam_openid_connect_provider_extract_from_arn
 
+  depends_on = [
+    module.vpc
+  ]
+
 }
 
 module "ecr" {
@@ -21,6 +25,10 @@ module "security_group" {
   source = "./modules/security_group"
   name   = var.name
   vpc_id = module.vpc.vpc_id
+
+  depends_on = [
+    module.vpc
+  ]
 }
 
 module "eks" {
@@ -36,6 +44,12 @@ module "eks" {
   namespace_depends_on   = module.helm.namespace_depends_on
   namespace           = module.helm.namespace
   security_group_ids  = [module.security_group.eks_security_group_id]
+
+  depends_on = [
+    module.iam,
+    module.vpc,
+    module.security_group
+  ]
 }
 
 module "helm" {
@@ -47,6 +61,12 @@ module "helm" {
   lbc_iam_role_arn   = module.iam.lbc_iam_role_arn
   vpc_id             = module.vpc.vpc_id
   aws_region         = var.region
+
+  depends_on = [
+    module.eks,
+    module.iam
+    module.vpc
+  ]
 }
 
 module "rds" {
@@ -56,4 +76,10 @@ module "rds" {
   db_username          = var.db_username
   database_name        = var.database_name
   rds_security_group_ids  = [module.security_group.rds_security_group_aurora_id]
+
+  depends_on = [
+    module.vpc,
+    module.security_group,
+    module.eks
+  ]
 }

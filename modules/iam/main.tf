@@ -1,4 +1,4 @@
-# IAM Role for EKS Cluster
+############################################## IAM Role for EKS Cluster ################################################
 resource "aws_iam_role" "eks_role" {
   name = "eksClusterRole"
   assume_role_policy = jsonencode({
@@ -18,7 +18,7 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
 }
 
-# IAM Role for EKS Node Group
+######################################## IAM Role for EKS Node Group #####################################################
 resource "aws_iam_role" "eks_node_role" {
   name = "eksNodeGroupRole"
   assume_role_policy = jsonencode({
@@ -33,7 +33,22 @@ resource "aws_iam_role" "eks_node_role" {
   })
 }
 
-# Resource: IAM Role for EKS Fargate Profile
+resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+}
+
+resource "aws_iam_role_policy_attachment" "ecr_read_only" {
+  role       = aws_iam_role.eks_node_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+####################################### IAM Role for EKS Fargate Profile ########################################################
 resource "aws_iam_role" "fargate_profile_role" {
   name = "${local.name}-eks-fargate-profile-role-apps"
 
@@ -49,13 +64,13 @@ resource "aws_iam_role" "fargate_profile_role" {
   })
 }
 
-# Resource: IAM Policy Attachment to IAM Role
+# IAM Policy Attachment to IAM Role
 resource "aws_iam_role_policy_attachment" "eks_fargate_pod_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSFargatePodExecutionRolePolicy"
   role       = aws_iam_role.fargate_profile_role.name
 }
 
-# Datasource: AWS Load Balancer Controller IAM Policy get from aws-load-balancer-controller/ GIT Repo (latest)
+### Datasource: AWS Load Balancer Controller IAM Policy get from aws-load-balancer-controller/ GIT Repo (latest)
 data "http" "lbc_iam_policy" {
   url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json"
 
@@ -70,7 +85,7 @@ output "lbc_iam_policy" {
   value = data.http.lbc_iam_policy.response_body
 }
 
-# Resource: Create AWS Load Balancer Controller IAM Policy 
+########################################## Create AWS Load Balancer Controller IAM Policy ################################################
 resource "aws_iam_policy" "lbc_iam_policy" {
   name        = "${var.name}-AWSLoadBalancerControllerIAMPolicy"
   path        = "/"
@@ -82,7 +97,7 @@ output "lbc_iam_policy_arn" {
   value = aws_iam_policy.lbc_iam_policy.arn 
 }
 
-# Resource: Create IAM Role 
+############################  Create IAM Role #############################################
 resource "aws_iam_role" "lbc_iam_role" {
   name = "${var.name}-lbc-iam-role"
 
@@ -118,25 +133,13 @@ resource "aws_iam_role_policy_attachment" "lbc_iam_role_policy_attach" {
   role       = aws_iam_role.lbc_iam_role.name
 }
 
+
+############################################## outputs #####################################################################
 output "lbc_iam_role_arn" {
   description = "AWS Load Balancer Controller IAM Role ARN"
   value = aws_iam_role.lbc_iam_role.arn
 }
 
-resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
-  role       = aws_iam_role.eks_node_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
-}
-
-resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
-  role       = aws_iam_role.eks_node_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
-}
-
-resource "aws_iam_role_policy_attachment" "ecr_read_only" {
-  role       = aws_iam_role.eks_node_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-}
 
 output "eks_cluster_role_arn" {
     value = aws_iam_role.eks_role.arn
