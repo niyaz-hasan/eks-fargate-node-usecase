@@ -8,6 +8,10 @@ app.config.from_object(Config)
 
 db = SQLAlchemy(app)
 
+# Register API routes
+from routes import api
+app.register_blueprint(api)
+
 # Example model
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
