@@ -46,12 +46,11 @@ resource "aws_eks_fargate_profile" "fargate_profile" {
 
 }
 
-
 # Datasource: AWS Partition
 # Use this data source to lookup information about the current AWS partition in which Terraform is working
 data "aws_partition" "current" {}
 
-# Resource: AWS IAM Open ID Connect Provider
+############################# AWS IAM Open ID Connect Provider ############################################################
 resource "aws_iam_openid_connect_provider" "oidc_provider" {
   client_id_list  = ["sts.${data.aws_partition.current.dns_suffix}"]
   thumbprint_list = [var.eks_oidc_root_ca_thumbprint]
@@ -78,3 +77,4 @@ output "aws_iam_openid_connect_provider_extract_from_arn" {
   description = "AWS IAM Open ID Connect Provider extract from ARN"
    value = local.aws_iam_oidc_connect_provider_extract_from_arn
 }
+
