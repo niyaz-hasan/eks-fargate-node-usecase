@@ -61,12 +61,6 @@ module "helm" {
   lbc_iam_role_arn   = module.iam.lbc_iam_role_arn
   vpc_id             = module.vpc.vpc_id
   aws_region         = var.region
-
-  depends_on = [
-    module.eks,
-    module.iam,
-    module.vpc
-  ]
 }
 
 module "rds" {
