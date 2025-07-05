@@ -10,7 +10,7 @@ def list_employees():
 @api.route('/api/employees', methods=['POST'])
 def add_employee():
     data = request.get_json()
-    emp = Employee(name=data['name'], department=data['department'])
+    emp = Employee(name=data['name'], department=data['department'],  phone=data.get('phone'))
     db.session.add(emp)
     db.session.commit()
     return jsonify(emp.to_dict()), 201
