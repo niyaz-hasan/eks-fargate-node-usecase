@@ -64,7 +64,7 @@ module "helm" {
 
   depends_on = [
     module.eks,
-    module.iam
+    module.iam,
     module.vpc
   ]
 }
