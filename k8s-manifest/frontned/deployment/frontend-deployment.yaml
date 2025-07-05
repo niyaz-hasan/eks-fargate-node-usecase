@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: <your-ecr-repo>/frontend:latest
+        image: 975049998898.dkr.ecr.us-east-1.amazonaws.com/react-app:latest
         ports:
         - containerPort: 80
         resources:

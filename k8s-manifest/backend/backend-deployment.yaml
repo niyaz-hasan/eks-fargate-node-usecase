@@ -16,29 +16,29 @@ spec:
       serviceAccountName: flask-sa
       containers:
       - name: backend
-        image: <your-ecr-repo>/backend:latest
+        image: 975049998898.dkr.ecr.us-east-1.amazonaws.com/flask-app:latest
         ports:
         - containerPort: 5000
         env:
         - name: DB_SECRET_NAME
-          value: "prod/db/credentials"
+          value: "rds!cluster-7875e7db-83ed-4a7c-a2b6-c1e6444698d6"
         - name: AWS_REGION
           value: "us-east-2"
         - name: DB_HOST
           valueFrom:
             configMapKeyRef:
               name: db-config
-              key: host
+              key: DB_HOST
         - name: DB_PORT
           valueFrom:
             configMapKeyRef:
               name: db-config
-              key: port
+              key: DB_PORT
         - name: DB_NAME
           valueFrom:
             configMapKeyRef:
               name: db-config
-              key: name
+              key: DB_NAME
         resources:
           limits:
             cpu: "1"
