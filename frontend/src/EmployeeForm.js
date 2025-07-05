@@ -2,35 +2,73 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 const EmployeeForm = ({ employee, onUpdate }) => {
-    const [phone, setPhone] = useState(employee.phone);
+    const [name, setName] = useState(employee?.name || '');
+    const [department, setDepartment] = useState(employee?.department || '');
+    const [phone, setPhone] = useState(employee?.phone || '');
     const token = localStorage.getItem('token');
+
+    const isEdit = !!employee;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(
-                `/api/employees/${employee.id}`,
-                { phone },
-                { headers: { 'x-access-token': token } }
-            );
-            onUpdate();
+            if (isEdit) {
+                await axios.put(
+                    `/api/employees/${employee.id}`,
+                    { phone },
+                    { headers: { 'x-access-token': token } }
+                );
+            } else {
+                await axios.post(
+                    `/api/employees`,
+                    { name, department, phone },
+                    { headers: { 'x-access-token': token } }
+                );
+            }
+            onUpdate(); // Close form & refresh
         } catch (error) {
-            console.error('Error updating employee:', error);
+            console.error('Error saving employee:', error);
         }
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <h3>Update {employee.name}</h3>
+            <h3>{isEdit ? `Update ${employee.name}` : 'Add New Employee'}</h3>
+            {!isEdit && (
+                <>
+                    <label>
+                        Name:
+                        <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </label>
+                    <br />
+                    <label>
+                        Department:
+                        <input
+                            type="text"
+                            value={department}
+                            onChange={(e) => setDepartment(e.target.value)}
+                            required
+                        />
+                    </label>
+                    <br />
+                </>
+            )}
             <label>
                 Phone:
                 <input
                     type="text"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
+                    required
                 />
             </label>
-            <button type="submit">Update</button>
+            <br />
+            <button type="submit">{isEdit ? 'Update' : 'Add'}</button>
         </form>
     );
 };

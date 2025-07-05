@@ -4,15 +4,22 @@ import EmployeeForm from './EmployeeForm';
 
 function App() {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [addingNew, setAddingNew] = useState(false);
+
+    const handleFormClose = () => {
+        setSelectedEmployee(null);
+        setAddingNew(false);
+    };
 
     return (
         <div className="App">
             <h1>Employee Directory</h1>
+            <button onClick={() => setAddingNew(true)}>Add Employee</button>
             <EmployeeList onSelectEmployee={setSelectedEmployee} />
-            {selectedEmployee && (
+            {(selectedEmployee || addingNew) && (
                 <EmployeeForm
                     employee={selectedEmployee}
-                    onUpdate={() => setSelectedEmployee(null)}
+                    onUpdate={handleFormClose}
                 />
             )}
         </div>
