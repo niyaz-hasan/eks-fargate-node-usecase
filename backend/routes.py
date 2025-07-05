@@ -1,56 +1,83 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 from models import db, Employee
-from werkzeug.security import generate_password_hash, check_password_hash
+import jwt
+from functools import wraps
+import datetime
+from flask import current_app
 
-api_blueprint = Blueprint('api', __name__)
+main = Blueprint('main', __name__)
 
-@api_blueprint.route('/login', methods=['POST'])
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'x-access-token' in request.headers:
+            token = request.headers['x-access-token']
+
+        if not token:
+            return jsonify({'message' : 'Token is missing!'}), 401
+
+        try: 
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=["HS256"])
+            current_user = Employee.query.filter_by(id=data['id']).first()
+        except:
+            return jsonify({'message' : 'Token is invalid!'}), 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
+
+@main.route('/api/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-    
-    # In a real app, you would verify credentials against a user database
-    # This is a simplified example
-    if email == 'admin@company.com' and password == 'password':
-        access_token = create_access_token(identity=email)
-        return jsonify(access_token=access_token), 200
-    else:
-        return jsonify({"msg": "Bad credentials"}), 401
+    auth = request.authorization
 
-@api_blueprint.route('/employees', methods=['GET'])
-@jwt_required()
-def get_employees():
-    search = request.args.get('search', '')
+    if not auth or not auth.username or not auth.password:
+        return jsonify({'message': 'Could not verify'}), 401
+
+    user = Employee.query.filter_by(email=auth.username).first()
+
+    if not user or not user.check_password(auth.password):
+        return jsonify({'message': 'Could not verify'}), 401
+    
+    token = jwt.encode({'id': user.id, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, current_app.config['SECRET_KEY'])
+    
+    return jsonify({'token' : token})
+
+@main.route('/api/employees', methods=['GET'])
+@token_required
+def get_employees(current_user):
+    name = request.args.get('name')
+    department = request.args.get('department')
+    
     query = Employee.query
-    
-    if search:
-        query = query.filter(
-            (Employee.name.ilike(f'%{search}%')) | 
-            (Employee.department.ilike(f'%{search}%'))
-        )
-    
+    if name:
+        query = query.filter(Employee.name.ilike(f'%{name}%'))
+    if department:
+        query = query.filter(Employee.department.ilike(f'%{department}%'))
+        
     employees = query.all()
-    return jsonify([employee.to_dict() for employee in employees])
+    return jsonify([e.to_dict() for e in employees])
 
-@api_blueprint.route('/employees/<int:employee_id>', methods=['PUT'])
-@jwt_required()
-def update_employee(employee_id):
-    current_user = get_jwt_identity()
-    employee = Employee.query.get_or_404(employee_id)
-    
-    # In a real app, you would verify the user can only update their own record
+@main.route('/api/employees/<int:id>', methods=['PUT'])
+@token_required
+def update_employee(current_user, id):
+    if current_user.id != id:
+        return jsonify({'message': 'Cannot update another user'}), 403
+        
     data = request.get_json()
+    employee = Employee.query.get_or_404(id)
     
-    employee.name = data.get('name', employee.name)
-    employee.email = data.get('email', employee.email)
-    employee.department = data.get('department', employee.department)
     employee.phone = data.get('phone', employee.phone)
+    # Add other updatable fields as necessary
     
     db.session.commit()
     return jsonify(employee.to_dict())
 
-@api_blueprint.route('/health', methods=['GET'])
-def health_check():
-    return jsonify({"status": "healthy"}), 200
+@main.route('/api/employees/<int:id>', methods=['DELETE'])
+@token_required
+def delete_employee(current_user, id):
+    # In a real-world scenario, you might restrict deletion to admins
+    employee = Employee.query.get_or_404(id)
+    db.session.delete(employee)
+    db.session.commit()
+    return '', 204
