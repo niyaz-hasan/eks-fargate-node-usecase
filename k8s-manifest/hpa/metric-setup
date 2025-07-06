@@ -12,10 +12,10 @@ kubectl get deployment metrics-server -n kube-system
 kubectl get hpa
 
 # List specific HPA
-kubectl get hpa test-python-hpa
+kubectl get hpa frontend-hpa
 
 # Describe HPA
-kubectl describe hpa/test-python-hpa 
+kubectl describe hpa/frontend-hpa 
 
 # List Pods
 kubectl get pods
