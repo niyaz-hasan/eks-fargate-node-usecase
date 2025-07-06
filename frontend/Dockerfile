@@ -1,31 +1,16 @@
-# Stage 1: Build the React application
-FROM node:16-alpine as build
-
+# ───── Stage 1: React build ────────────────────────────────────────────────
+FROM node:20-alpine AS builder
 WORKDIR /app
 
-# Copy package files first for better caching
-COPY package.json  ./
+COPY package*.json ./
+RUN npm ci        # reproducible install
 
-# Install dependencies
-RUN npm install 
-
-# Copy all source files
 COPY . .
+RUN npm run build           # outputs to /app/build  (see webpack)
 
-# Build the application
-RUN npm run build
-
-# Stage 2: Serve the application using Nginx
-FROM nginx:1.21-alpine
-
-# Copy built assets from the previous stage
-COPY --from=build /app/build /usr/share/nginx/html
-
-# Copy custom nginx configuration
+# ───── Stage 2: Nginx runtime ──────────────────────────────────────────────
+FROM nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
+COPY --from=builder /app/build /usr/share/nginx/html
 EXPOSE 80
-
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

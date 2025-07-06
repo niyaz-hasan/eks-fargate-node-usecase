@@ -1,55 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
-const EmployeeList = ({ onSelectEmployee }) => {
-    const [employees, setEmployees] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [searchDept, setSearchDept] = useState('');
+import React, { useContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
+import { Link } from "react-router-dom";
 
-    // A placeholder for a real login flow
-    const token = localStorage.getItem('token'); 
+export default function EmployeeList() {
+  const { authFetch, logout } = useContext(AuthContext);
+  const [employees, setEmployees] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
-    const fetchEmployees = async () => {
-        try {
-            const response = await axios.get('/api/employees', {
-                headers: { 'x-access-token': token },
-                params: { name: searchTerm, department: searchDept },
-            });
-            setEmployees(response.data);
-        } catch (error) {
-            console.error('Error fetching employees:', error);
+  const load = (q = "") => {
+    setLoading(true);
+    const qs = q ? `?search=${encodeURIComponent(q)}` : "";
+    authFetch(`/api/employees${qs}`)
+      .then(async res => {
+        if (res.status === 401) {
+          logout();
+          return [];
         }
-    };
+        if (!res.ok) return [];
+        try { return await res.json(); } catch { return []; }
+      })
+      .then(data => { setEmployees(data); setLoading(false); });
+  };
 
-    useEffect(() => {
-        if (token) {
-            fetchEmployees();
-        }
-    }, [searchTerm, searchDept, token]);
+  useEffect(() => { load(); }, []); // initial load
 
-    return (
-        <div>
-            <input
-                type="text"
-                placeholder="Search by name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <input
-                type="text"
-                placeholder="Search by department..."
-                value={searchDept}
-                onChange={(e) => setSearchDept(e.target.value)}
-            />
-            <ul>
-                {employees.map((employee) => (
-                    <li key={employee.id} onClick={() => onSelectEmployee(employee)}>
-                        {employee.name} - {employee.department}
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
-};
+  return (
+    <div style={{ marginTop: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h2>Employees</h2>
+        <button onClick={logout}>Logout</button>
+      </div>
 
-export default EmployeeList;
+      {/* Search */}
+      <form onSubmit={e => { e.preventDefault(); load(search); }}>
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search" />
+        <button>Search</button>
+        <Link to="/employees/add" style={{ marginLeft: 10 }}>+ Add employee</Link>
+      </form>
+
+      {/* Results */}
+      {loading ? <p>Loading…</p> : employees.length === 0 ?
+        <p>No employees found.</p> :
+        <table style={{ marginTop: 10 }}>
+          <thead><tr><th>Name</th><th>Department</th></tr></thead>
+          <tbody>
+            {employees.map(e => <tr key={e.id}><td>{e.name}</td><td>{e.department}</td></tr>)}
+          </tbody>
+        </table>
+      }
+    </div>
+  );
+}

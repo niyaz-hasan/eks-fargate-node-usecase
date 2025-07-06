@@ -1,76 +1,36 @@
-import React, { useState } from 'react';
-import axios from 'axios';
 
-const EmployeeForm = ({ employee, onUpdate }) => {
-    const [name, setName] = useState(employee?.name || '');
-    const [department, setDepartment] = useState(employee?.department || '');
-    const [phone, setPhone] = useState(employee?.phone || '');
-    const token = localStorage.getItem('token');
+import React, { useState, useContext } from "react";
+import { AuthContext } from "./AuthContext";
+import { useNavigate } from "react-router-dom";
 
-    const isEdit = !!employee;
+export default function EmployeeForm() {
+  const { authFetch } = useContext(AuthContext);
+  const nav = useNavigate();
+  const [name, setName] = useState("");
+  const [department, setDept] = useState("");
+  const [err, setErr] = useState("");
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            if (isEdit) {
-                await axios.put(
-                    `/api/employees/${employee.id}`,
-                    { phone },
-                    { headers: { 'x-access-token': token } }
-                );
-            } else {
-                await axios.post(
-                    `/api/employees`,
-                    { name, department, phone },
-                    { headers: { 'x-access-token': token } }
-                );
-            }
-            onUpdate(); // Close form & refresh
-        } catch (error) {
-            console.error('Error saving employee:', error);
-        }
-    };
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setErr("");
+    const res = await authFetch("/api/employees", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, department })
+    });
+    if (!res.ok) {
+      setErr("Failed to add employee");
+      return;
+    }
+    nav("/employees");  // back to list
+  }
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <h3>{isEdit ? `Update ${employee.name}` : 'Add New Employee'}</h3>
-            {!isEdit && (
-                <>
-                    <label>
-                        Name:
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                        />
-                    </label>
-                    <br />
-                    <label>
-                        Department:
-                        <input
-                            type="text"
-                            value={department}
-                            onChange={(e) => setDepartment(e.target.value)}
-                            required
-                        />
-                    </label>
-                    <br />
-                </>
-            )}
-            <label>
-                Phone:
-                <input
-                    type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                />
-            </label>
-            <br />
-            <button type="submit">{isEdit ? 'Update' : 'Add'}</button>
-        </form>
-    );
-};
-
-export default EmployeeForm;
+  return (
+    <form onSubmit={handleSubmit} style={{ marginTop: 20 }}>
+      {err && <p style={{ color: "red" }}>{err}</p>}
+      <input value={name} onChange={e => setName(e.target.value)} placeholder="Name" required />
+      <input value={department} onChange={e => setDept(e.target.value)} placeholder="Department" required />
+      <button>Add</button>
+    </form>
+  );
+}

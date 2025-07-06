@@ -1,26 +1,29 @@
-# Use an official Python runtime as a parent image
-FROM python:3.9-slim
+##################### build stage #####################
+FROM python:3.12-slim AS builder
 
-# Set the working directory in the container
+# 🔧 system packages required to compile cryptography
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libssl-dev \
+    libffi-dev && \
+    rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
-# Install system dependencies that might be needed by some Python packages
-RUN apt-get update && apt-get install -y --no-install-recommends gcc && rm -rf /var/lib/apt/lists/*
-
-# Copy the requirements file into the container at /app
 COPY requirements.txt .
-
-# Install any needed packages specified in requirements.txt
-# Using --no-cache-dir to reduce image size
 RUN pip install --no-cache-dir -r requirements.txt
 
-
-# Copy the rest of the application's code into the container
 COPY . .
+##################### runtime stage ###################
+FROM python:3.12-slim
 
-# Make port 5000 available to the world outside this container
+# same unprivileged user section you already have …
+RUN addgroup --system app && adduser --system --ingroup app app
+WORKDIR /app
+COPY --from=builder /usr/local /usr/local
+COPY --from=builder /app /app
+USER app
+
 EXPOSE 5000
-
-
-# Run app.py when the container launches
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "app:app"]
