@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: 975049998898.dkr.ecr.us-east-1.amazonaws.com/react-app:v3
+        image: 975049998898.dkr.ecr.us-east-1.amazonaws.com/react-app:v5
         ports:
         - containerPort: 80
         resources:
