@@ -85,6 +85,13 @@ resource "kubernetes_namespace" "fargate_namespace" {
   }
 }
 
+# Resource: Kubernetes Namespace backend
+resource "kubernetes_namespace" "backend" {
+  metadata {
+    name = "backend"
+  }
+}
+
 # Helm to install and setup prometheus and grafana 
 resource "helm_release" "prometheus_grafana_stack" {
   name       = "kube-prometheus-stack"
