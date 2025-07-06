@@ -9,14 +9,14 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/backend-protocol: HTTP
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
-    alb.ingress.kubernetes.io/healthcheck-path: /
+    alb.ingress.kubernetes.io/healthcheck-path: /api/
     alb.ingress.kubernetes.io/group.name: employee-directory
     alb.ingress.kubernetes.io/load-balancer-attributes: idle_timeout.timeout_seconds=60
 spec:
   rules:
     - http:
         paths:
-          - path: /
+          - path: /api/
             pathType: Prefix
             backend:
               service:
