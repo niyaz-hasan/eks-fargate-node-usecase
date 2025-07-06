@@ -1,0 +1,21 @@
+# Verify if Metrics Server already Installed
+kubectl -n kube-system get deployment/metrics-server
+
+# Install Metrics Server
+kubectl apply -f kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.2/components.yaml
+
+# Verify
+kubectl get deployment metrics-server -n kube-system
+
+
+# List all HPA
+kubectl get hpa
+
+# List specific HPA
+kubectl get hpa test-python-hpa
+
+# Describe HPA
+kubectl describe hpa/test-python-hpa 
+
+# List Pods
+kubectl get pods
