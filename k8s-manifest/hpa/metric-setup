@@ -2,14 +2,14 @@
 kubectl -n kube-system get deployment/metrics-server
 
 # Install Metrics Server
-kubectl apply -f kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.2/components.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.7.2/components.yaml
 
 # Verify
 kubectl get deployment metrics-server -n kube-system
 
 
 # List all HPA
-kubectl get hpa
+kubectl get hpa -n frontend 
 
 # List specific HPA
 kubectl get hpa frontend-hpa
