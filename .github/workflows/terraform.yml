@@ -1,0 +1,70 @@
+name: Terraform Apply and Destroy
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Terraform action to perform'
+        required: true
+        default: 'destroy'
+        type: choice
+        options:
+          - destroy
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  terraform:
+    name: Terraform Apply or Destroy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials with OIDC.
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::975049998898:role/githubaction-assumerole
+         # role-session-name: github-assume
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+       
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -recursive
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+        
+      - name: Terraform Init & Plan
+        run: |
+          terraform init
+          terraform plan
+          
+      - name: Terraform Apply
+        if: contains(github.event.head_commit.message, 'terraform apply')
+        run: terraform apply -auto-approve 
+
+      - name: Terraform Destroy
+        if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
+        run: terraform destroy -auto-approve 
+      
+ 
