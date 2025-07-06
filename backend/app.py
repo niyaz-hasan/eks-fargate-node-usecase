@@ -41,25 +41,25 @@ RETRY_DELAY_SECS = int(os.getenv("DB_CONN_DELAY", 3))
 # Helpers
 # --------------------------------------------------------------------------- #
 def _load_rds_secret() -> dict:
-    """Fetch JSON secret from Secrets Manager and return as dict."""
-    secret_arn = os.environ.get("DB_SECRET_ARN")
-    region     = os.environ.get("AWS_REGION", "ap-south-1")
+    """Fetch JSON secret from Secrets Manager using secret name."""
+    secret_name = os.environ.get("DB_SECRET_NAME")
+    region      = os.environ.get("AWS_REGION", "us-east-1")
 
-    if not secret_arn:
-        raise RuntimeError("DB_SECRET_ARN env var not set in backend pod")
+    if not secret_name:
+        raise RuntimeError("DB_SECRET_NAME env var not set in backend pod")
 
     sm = boto3.client("secretsmanager", region_name=region)
-    resp = sm.get_secret_value(SecretId=secret_arn)
+    resp = sm.get_secret_value(SecretId=secret_name)
     return json.loads(resp["SecretString"])
 
 
 def _build_db_uri(secret: dict) -> str:
-    """Return SQLAlchemy URI from secret fields."""
+    """Construct SQLAlchemy URI using secret and env-config values."""
     user     = secret["username"]
     password = secret["password"]
-    host     = secret["host"]
-    port     = secret.get("port", 3306)
-    dbname   = secret["dbname"]
+    host     = os.environ.get("DB_HOST", "localhost")
+    port     = os.environ.get("DB_PORT", "3306")
+    dbname   = os.environ.get("DB_NAME", "employees")
 
     return f"mysql+pymysql://{user}:{password}@{host}:{port}/{dbname}"
 
