@@ -1,8 +1,8 @@
-name: Build and Push to ECR
+name: Build and Push to ECR backend
 on:
   push:
     paths:
-      - 'backend/**'
+      - 'backend1/**'
       - 'k8s-manifest/backend/**'
       - '.github/workflows/build-deploy.yml'
   workflow_dispatch:

@@ -16,7 +16,7 @@ spec:
       serviceAccountName: flask-sa
       containers:
       - name: backend
-        image: 975049998898.dkr.ecr.us-east-1.amazonaws.com/flask-app:6
+        image: CONTAINER_IMAGE
         ports:
         - containerPort: 5000
         env:
