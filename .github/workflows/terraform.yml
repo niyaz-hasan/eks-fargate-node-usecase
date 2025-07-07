@@ -66,7 +66,6 @@ jobs:
       - name: Terraform Destroy
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
         run: | 
-          terraform destroy -target=module.helm -auto-approve
           terraform destroy -auto-approve 
       
- 
+ # terraform destroy -target=module.helm -auto-approve
