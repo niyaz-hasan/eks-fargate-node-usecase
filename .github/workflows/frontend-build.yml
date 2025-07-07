@@ -11,19 +11,19 @@ permissions:
   id-token: write
   contents: read
 
-#jobs:
-#  build-push-APi-react:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout
-#        uses: actions/checkout@v4
-#
-#      - name: Configure AWS credentials with OIDC
-#        uses: aws-actions/configure-aws-credentials@v4
-#        with:
-#          role-to-assume: arn:aws:iam::975049998898:role/githubaction-assumerole
-#          role-session-name: github-assume
-#          aws-region: us-east-1
+jobs:
+  build-push-APi-react:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials with OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::975049998898:role/githubaction-assumerole
+          role-session-name: github-assume
+          aws-region: us-east-1
 #
 #      - name: Login to Amazon ECR # login ecr
 #        id: login-ecr
