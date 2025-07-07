@@ -2,24 +2,130 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8" />
-  <title>Employee Directory</title>
+    <meta charset="utf-8" />
+    <title>Employee Directory</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="favicon.ico" />
+    <meta name="theme-color" content="#1976d2" />
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #8e44ad);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
 
-  <!-- Responsive layout on mobiles -->
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+        .corner-label {
+            position: fixed;
+            top: 15px;
+            font-weight: bold;
+            font-size: 18px;
+            color: white;
+            z-index: 9999;
+        }
 
-  <!-- Optional favicon / manifest if provided -->
-  <link rel="icon" href="favicon.ico" />
-  <!-- If you have a manifest.json file, uncomment the line below -->
-  <!-- <link rel="manifest" href="manifest.json" /> -->
+        .left-corner {
+            left: 20px;
+        }
 
-  <meta name="theme-color" content="#1976d2" />
+        .right-corner {
+            right: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 40px;
+            text-align: center;
+            font-size: 32px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 12px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #1e3c72;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px 0;
+            background-color: #1e3c72;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        button:hover {
+            background-color: #8e44ad;
+            transform: scale(1.02);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 500px) {
+            h1 {
+                font-size: 26px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-  <noscript>You need to enable JavaScript to run this app.</noscript>
-  <div id="root"></div>
-  <!-- React app gets injected here -->
-  </body>
+    <div class="corner-label left-corner">HCL</div>
+    <div class="corner-label right-corner">BAYER</div>
+
+    <div class="container">
+        <h2>Employee Directory Sign In</h2>
+        <input type="text" placeholder="Username" />
+        <input type="password" placeholder="Password" />
+        <button>Login</button>
+    </div>
+</body>
 
 </html>
