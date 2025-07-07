@@ -4,7 +4,7 @@ on:
     paths:
       - 'frontend/**'
       - 'k8s-manifest/frontend/**'
-      - '.github/workflows/build-deploy.yml'
+      - '.github/workflows/frontend-build.yml'
   workflow_dispatch:
 
 permissions:
