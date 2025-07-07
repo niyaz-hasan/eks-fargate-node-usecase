@@ -2,130 +2,75 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <title>Employee Directory</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" href="favicon.ico" />
-    <meta name="theme-color" content="#1976d2" />
-    <style>
-        body {
-            margin: 0;
-            height: 100vh;
-            background: linear-gradient(135deg, #1e3c72, #8e44ad);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
+  <meta charset="utf-8" />
+  <title>Employee Directory</title>
 
-        .corner-label {
-            position: fixed;
-            top: 15px;
-            font-weight: bold;
-            font-size: 18px;
-            color: white;
-            z-index: 9999;
-        }
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="favicon.ico" />
+  <meta name="theme-color" content="#1976d2" />
 
-        .left-corner {
-            left: 20px;
-        }
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
-        .right-corner {
-            right: 20px;
-        }
-
-        .container {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            animation: fadeIn 1s ease;
-        }
-
-        h1 {
-            color: white;
-            margin-bottom: 40px;
-            text-align: center;
-            font-size: 32px;
-        }
-
-        h2 {
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 24px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 15px;
-            margin: 12px 0;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-
-        input:focus {
-            border-color: #1e3c72;
-            outline: none;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px 0;
-            background-color: #1e3c72;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        button:hover {
-            background-color: #8e44ad;
-            transform: scale(1.02);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @media (max-width: 500px) {
-            h1 {
-                font-size: 26px;
-            }
-
-            h2 {
-                font-size: 20px;
-            }
-        }
-    </style>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <div class="corner-label left-corner">HCL</div>
-    <div class="corner-label right-corner">BAYER</div>
+<body class="bg-gray-50 font-sans text-gray-800">
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
 
-    <div class="container">
-        <h2>Employee Directory Sign In</h2>
-        <input type="text" placeholder="Username" />
-        <input type="password" placeholder="Password" />
-        <button>Login</button>
-    </div>
+  <!-- Example UI Structure -->
+  <script type="text/babel">
+
+    function App() {
+      return (
+        <div className="min-h-screen flex flex-col">
+          {/* Header */}
+          <header className="bg-blue-600 text-white p-4 shadow-lg">
+            <h1 className="text-2xl font-bold text-center">Employee Directory</h1>
+          </header>
+
+          {/* Search Bar */}
+          <div className="p-4 flex justify-center">
+            <input
+              type="text"
+              placeholder="Search by name or department..."
+              className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            />
+          </div>
+
+          {/* Employee Cards */}
+          <main className="flex-1 p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {/* Example Card */}
+            <div className="bg-white rounded-xl shadow-md p-4 hover:shadow-xl transition-shadow">
+              <div className="flex items-center space-x-4">
+                <img src="https://via.placeholder.com/80" alt="Employee" className="w-20 h-20 rounded-full object-cover" />
+                <div>
+                  <h2 className="text-xl font-semibold">John Doe</h2>
+                  <p className="text-gray-600">Software Engineer</p>
+                </div>
+              </div>
+            </div>
+            {/* Repeat the card as needed */}
+          </main>
+
+          {/* Footer */}
+          <footer className="bg-gray-200 text-center p-4 text-sm text-gray-600">
+            © 2025 Employee Directory
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+
+  <!-- React & Babel CDN -->
+  <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
 </body>
 
 </html>
