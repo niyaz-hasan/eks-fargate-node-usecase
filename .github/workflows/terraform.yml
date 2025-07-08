@@ -66,7 +66,7 @@ jobs:
       - name: Terraform Destroy
         if: github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'destroy'
         run: | 
-          terraform state rm module.helm.kubernetes_namespace.fargate_namespace
           terraform destroy -auto-approve 
       
- # terraform destroy -target=module.helm -auto-approve
+# terraform destroy -target=module.helm -auto-approve
+# terraform state rm module.helm.kubernetes_namespace.fargate_namespace
